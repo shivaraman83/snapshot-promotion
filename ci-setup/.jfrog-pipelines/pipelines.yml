@@ -25,7 +25,8 @@ pipelines:
           integrations:
             - name: artifactory
           inputResources:
-            - name: snapshot_promotion     # Trigger execution on code commit
+            - name: snapshot_promotion
+
         execution:
           onStart:
             - |
@@ -49,7 +50,6 @@ pipelines:
             - ls -lR
             - jf rt build-collect-environment
             - jf rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-            - save_artifact_info buildInfo summaryOutput.json --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
 
       - name: build_publish
         type: PublishBuildInfo
