@@ -18,7 +18,6 @@ pipelines:
     configuration:
       retentionPolicy:
         maxAgeDays: 30
-        minRuns: 15
     steps:
       - name: moverepo
         type: Bash
