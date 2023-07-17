@@ -44,11 +44,11 @@ pipelines:
               PATH="$M2_HOME/bin:$PATH"
               export PATH
               mvn -version
+              curl -fL https://install-cli.jfrog.io | sh
           onExecute:
             - echo "Hello World!"
           onComplete:
             - ls -lR
-            - curl -fL https://install-cli.jfrog.io | sh
             - jfrog rt build-collect-environment
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
 
