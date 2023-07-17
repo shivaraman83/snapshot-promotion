@@ -14,7 +14,7 @@ resources:
       sourceArtifactory: artifactory
 
 pipelines:
-  - name: snapshot-promotion-example
+  - name: snapshot_promotion_example
     configuration:
       retentionPolicy:
         maxAgeDays: 30
