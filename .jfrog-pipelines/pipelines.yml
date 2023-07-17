@@ -1,0 +1,82 @@
+
+resources:
+  - name: pipelines_script_repo_2
+    type: GitRepo
+    configuration:
+      gitProvider: github_ram
+      path: ramkannan-s/jfrog-pipelines-sample-1
+      branches:
+        include: main
+
+  - name: maven_repo
+    type: GitRepo
+    configuration:
+      gitProvider: github_ram
+      path: ramkannan-s/frogbot-maven-hello-world
+      branches:
+        include: main
+
+  - name: mvn_build_info
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: artifactory
+
+pipelines:
+  - name: maven_ci_build_normal_jfrog
+    configuration:
+      retentionPolicy:
+        maxAgeDays: 30
+        minRuns: 15
+    steps:
+      - name: maven_build_normal
+        type: Bash
+        configuration:
+          integrations:
+            - name: genericcreds
+          inputResources:
+            - name: maven_repo     # Trigger execution on code commit
+        execution:
+          onStart:
+            - |
+              wget https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz
+              tar -xvf openjdk-13.0.1_linux-x64_bin.tar.gz
+              mv jdk-13.0.1 /opt/
+              JAVA_HOME='/opt/jdk-13.0.1'
+              PATH="$JAVA_HOME/bin:$PATH"
+              export PATH
+              
+              wget https://mirrors.estointernet.in/apache/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz
+              tar -xvf apache-maven-3.8.5-bin.tar.gz
+              mv apache-maven-3.8.5 /opt/
+              M2_HOME='/opt/apache-maven-3.8.5'
+              PATH="$M2_HOME/bin:$PATH"
+              export PATH
+              mvn -version
+          onExecute:
+            - echo "Hello World!"
+            - cd ./dependencyState/resources/maven_repo/
+            - mvn clean install
+            - ls -lsa
+            - printenv int_genericcreds_india
+          onComplete:
+            - ls -lR
+            - add_run_files ./target/ramlab_hello-1.0.1.jar test.jar
+            - jfrog rt build-collect-environment
+            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - save_artifact_info buildInfo summaryOutput.json --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
+
+      - name: maven_app_build_publish
+        type: PublishBuildInfo
+        configuration:
+          forceXrayScan: true
+          inputSteps:
+            - name: maven_build_jfrog
+              status:
+                - success
+          outputResources:
+            - name: mvn_build_info
+
+
+
+
+
