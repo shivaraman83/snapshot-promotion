@@ -1,6 +1,6 @@
 
 resources:
-  - name: snapshot_promotion_sample
+  - name: snapshot_promotion
     type: GitRepo
     configuration:
       gitProvider: sivasgithub
