@@ -24,6 +24,8 @@ pipelines:
         configuration:
           integrations:
             - name: artifactory
+          inputResources:
+            - name: snapshot_promotion     # Trigger execution on code commit
         execution:
           onStart:
             - |
