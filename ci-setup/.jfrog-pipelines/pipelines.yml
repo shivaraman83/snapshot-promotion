@@ -48,8 +48,9 @@ pipelines:
             - echo "Hello World!"
           onComplete:
             - ls -lR
+            - curl -fL https://install-cli.jfrog.io | sh
             - jf rt build-collect-environment
-            - jf rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - jf rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
 
       - name: build_publish
         type: PublishBuildInfo
